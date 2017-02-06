@@ -5,7 +5,7 @@
     <parent>
         <artifactId>beadledom-parent</artifactId>
         <groupId>com.cerner.beadledom</groupId>
-        <version>2.3-SNAPSHOT</version>
+        <version>2.4-SNAPSHOT</version>
     </parent>
 
     <artifactId>beadledom-testing</artifactId>
@@ -39,4 +39,33 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>build-scala-doc</id>
+            <activation>
+                <property>
+                    <name>attachScaladocs</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <version>${scala-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>attach-scaladocs</id>
+                                <goals>
+                                    <goal>doc-jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

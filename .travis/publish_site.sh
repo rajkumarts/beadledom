@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Colors
 RESET='\e[0m'           # Reset
 RED='\e[0;31m'          # Red
@@ -19,9 +21,22 @@ BWHITE='\e[1;37m'       # Bold White
 
 function display_usage() {
   printf "${GREEN}Usage:\n"
-  printf "${YELLOW}      ./prepare_site.sh [version|dev]\n\n"
-  printf "${GREEN}   Example: ${YELLOW}./prepare_site.sh 2.2 ${GREEN}- Prepare docs for 2.2 release.\n"
-  printf "${GREEN}   Example: ${YELLOW}./prepare_site.sh dev ${GREEN}- Prepare docs for current SNAPSHOT.\n$RESET"
+  printf "${YELLOW}      ./publish_site.sh [version|dev]\n\n"
+  printf "${GREEN}   Example: ${YELLOW}./publish_site.sh 2.2 ${GREEN}- Prepare docs for 2.2 release.\n"
+  printf "${GREEN}   Example: ${YELLOW}./publish_site.sh dev ${GREEN}- Prepare docs for current SNAPSHOT.\n$RESET"
+}
+
+function add-ssh-keys() {
+  chmod 600 $GPG_DIR/deploy_site_key
+  eval `ssh-agent -s`
+  ssh-add $GPG_DIR/deploy_site_key
+}
+
+function configure-git() {
+  add-ssh-keys
+
+  git config --global user.name "travis-ci"
+  git config --global user.email "travis@travis-ci.org"
 }
 
 if [[ "$#" -eq 0 ]]; then
@@ -32,6 +47,8 @@ elif [[ "$1" == "--help" ]]; then
   display_usage
   exit 0
 fi
+
+configure-git
 
 release_tag="$1"
 
@@ -73,7 +90,8 @@ printf "${CYAN}Staging site.$RESET \n"
 mvn site:stage
 
 printf "${CYAN}Checking out gh-pages branch.$RESET \n"
-git checkout gh-pages
+git remote set-branches --add origin gh-pages && git fetch -q
+git checkout -b gh-pages origin/gh-pages
 
 if [ ! -d "$release_tag" ]; then
   printf "${CYAN}Creating site directory ${WHITE}${release_tag}.$RESET \n"
@@ -88,13 +106,18 @@ cp -r target/staging/* "$release_tag"/
 
 printf "${CYAN}Creating redirecting index.html.$RESET \n"
 mv target/build_index.sh "."
-sh ./build_index.sh "$release_tag"
+bash ./build_index.sh "$release_tag"
 
 printf "${CYAN}Generating git commit.$RESET \n"
 git add .
 git commit -m "Rebuilt docs for Beadledom ${release_tag}"
 
 printf "${CYAN}\nAll Done!$RESET"
-printf "${CYAN}\nReview and then push to gh-pages branch\n$RESET"
+printf "${CYAN}\nAutomatically pushing docs site for ${release_tag}.\n$RESET"
+
+REPO=`git config remote.origin.url`
+SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
+
+git push $SSH_REPO gh-pages
 
 exit $?

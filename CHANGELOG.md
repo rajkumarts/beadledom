@@ -1,8 +1,19 @@
 # Beadledom Changelog
 
-## 2.3 - In Progress
-* Add JavaDoc to doc site
-* Add user manual to doc site
+## 2.4 - In Development
+
+### Defects Corrected
+* Removed unnecessary loop in `ResteasyContextListener` which would cause infinite loop if run.
+* Fixed issue with redirects in the bootstrap script ([issue-15](https://github.com/cerner/beadledom/issues/15)).
+* WebApplicationException mapper is called when exceptions are thrown by the checkParam method in JaxRsParamConditions class ([#16](https://github.com/cerner/beadledom/pull/16)).
+
+## 2.3 - 24 01 2017
+
+### Enhancements
+* Fixed resteasy [compatibility issues](https://github.com/cerner/beadledom/issues/9).
+* Open sourced.
+* Add JavaDoc to doc site.
+* Add user manual to doc site.
 
 -------
 **Note**: The below versions were released internally and not available via Maven Central. These entries are kept to track down the history of beadledom.
