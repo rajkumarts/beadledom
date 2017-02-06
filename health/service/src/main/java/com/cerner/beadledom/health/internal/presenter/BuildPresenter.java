@@ -43,4 +43,8 @@ public class BuildPresenter {
   public String getBuildDateTime() {
     return buildInfo.getBuildDateTime().map(buildDateTime -> buildDateTime).orElse("Not Available");
   }
+
+  public Optional<String> getScmRevision() {
+    return buildInfo.getScmRevision();
+  }
 }

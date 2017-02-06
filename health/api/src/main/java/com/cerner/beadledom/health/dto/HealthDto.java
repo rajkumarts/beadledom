@@ -55,6 +55,7 @@ public abstract class HealthDto {
     BuildDto build = BuildDto.builder()
         .setArtifactName(serviceMetadata.getBuildInfo().getArtifactId())
         .setVersion(serviceMetadata.getBuildInfo().getVersion())
+        .setScmRevision(serviceMetadata.getBuildInfo().getScmRevision())
         .setBuildDateTime(serviceMetadata.getBuildInfo().getBuildDateTime())
         .build();
     return new AutoValue_HealthDto.Builder()
